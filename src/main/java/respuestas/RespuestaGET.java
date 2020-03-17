@@ -10,20 +10,23 @@ public class RespuestaGET implements HttpRespuesta
 {
 	// Estructura de una respuesta https://www.tutorialspoint.com/http/http_responses.htm
 	
+	private final String PATH_RAIZ = "src/main/resources";
+	
 	@Override
 	public void procesarSolicitud(String mensajeSolicitud, PrintWriter salida) 
 	{
 		File archivoSolicitado = null;
+		// mensajeSolicitud tine / de primero
+		String path = PATH_RAIZ + mensajeSolicitud;
 
-		if(mensajeSolicitud.contains("/"))
+		if(mensajeSolicitud.length() == 1 && mensajeSolicitud.charAt(0) == '/' )
 		{			
 			// Obtener index.html
-			archivoSolicitado = new File("src/main/resources/index.html");
+			path = path.concat("index.html");
 		}
-		else
-		{
-			// Obtener del archivo de acuerdo al path de parametro
-		}
+
+		// Obtener del archivo de acuerdo al path de parametro
+		archivoSolicitado = new File(path);
 		
 		if(archivoSolicitado.exists())
 		{
@@ -31,15 +34,14 @@ public class RespuestaGET implements HttpRespuesta
 			salida.print("Date: Mon, 27 Jul 2009 12:28:53 GMT\r\n");
 			salida.print("Server: MiServidor/1.0\r\n");
 			salida.print("Content-Length: " + archivoSolicitado.length() +"\r\n");
-			salida.print("Content-Type: text/html\r\n");
-			salida.print("Connection: Closed\r\n");
+			salida.print("Content-Type: text/html\r\n");	// Extraer el dominio y procesarlo con un xml
 			salida.print("\r\n"); // Listo los headers, lo siguiente es el mensaje como tal
 			
 			responderArchivo(salida);
 		}
 		else
 		{
-			// error
+			// Error
 		}
 	}
 	

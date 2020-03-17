@@ -64,6 +64,8 @@ public class ServidorWeb
             	respuesta.procesarSolicitud(mensajeSolicitud, out);
             }
             
+            
+            respuesta = null;
             out.close();
             in.close();
             socket.close();

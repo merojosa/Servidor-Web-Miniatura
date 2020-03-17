@@ -10,7 +10,6 @@ import respuestas.HttpRespuesta;
 import respuestas.RespuestaGET;
 
 
-//https://www.journaldev.com/741/java-socket-programming-server-client#java-socket-server-example
 // http://www.java2s.com/Code/Java/Network-Protocol/AverysimpleWebserverWhenitreceivesaHTTPrequestitsendstherequestbackasthereply.htm
 public class ServidorWeb 
 {
@@ -18,7 +17,7 @@ public class ServidorWeb
     //static ServerSocket variable
     private ServerSocket socketServidor;
     //socket server port on which it will listen
-    private final int PUERTO = 9880;
+    private final int PUERTO = 9881;
     
     private HttpRespuesta respuesta = null;
     
@@ -27,7 +26,6 @@ public class ServidorWeb
 	{
         // Create the socket server object
         socketServidor = new ServerSocket(PUERTO);
-        
         
         
         // Keep listens indefinitely until receives 'exit' call or program terminates
@@ -63,9 +61,11 @@ public class ServidorWeb
             
             if(respuesta != null)
             {
-            	respuesta.procesarSolicitud(mensajeSolicitud);
+            	respuesta.procesarSolicitud(mensajeSolicitud, out);
             }
             
+            out.close();
+            in.close();
             socket.close();
         }
 	}

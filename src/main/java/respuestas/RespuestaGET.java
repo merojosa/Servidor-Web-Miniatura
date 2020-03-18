@@ -6,11 +6,19 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+import servidor.ProcesadorXML;
+
 public class RespuestaGET implements HttpRespuesta 
 {
 	// Estructura de una respuesta https://www.tutorialspoint.com/http/http_responses.htm
 	
 	private final String PATH_RAIZ = "src/main/resources";
+	private ProcesadorXML procesadorXML;
+	
+	public RespuestaGET() 
+	{
+		procesadorXML = new ProcesadorXML();
+	}
 	
 	@Override
 	public void procesarSolicitud(String mensajeSolicitud, PrintWriter salida) 
@@ -19,7 +27,7 @@ public class RespuestaGET implements HttpRespuesta
 		// mensajeSolicitud tine / de primero
 		String path = PATH_RAIZ + mensajeSolicitud;
 
-		if(mensajeSolicitud.length() == 1 && mensajeSolicitud.charAt(0) == '/' )
+		if(mensajeSolicitud.length() > 0 && mensajeSolicitud.charAt(mensajeSolicitud.length() - 1) == '/' )
 		{			
 			// Obtener index.html
 			path = path.concat("index.html");
@@ -28,13 +36,23 @@ public class RespuestaGET implements HttpRespuesta
 		// Obtener del archivo de acuerdo al path de parametro
 		archivoSolicitado = new File(path);
 		
+		
 		if(archivoSolicitado.exists())
 		{
 			salida.print("HTTP/1.1 200 OK\r\n");
 			salida.print("Date: Mon, 27 Jul 2009 12:28:53 GMT\r\n");
 			salida.print("Server: MiServidor/1.0\r\n");
 			salida.print("Content-Length: " + archivoSolicitado.length() +"\r\n");
-			salida.print("Content-Type: text/html\r\n");	// Extraer el dominio y procesarlo con un xml
+			
+			try 
+			{
+				// Extraer el dominio y obtener el tipo de acuerdo a web.xml
+				salida.print("Content-Type: " + procesadorXML.procesar(obtenerExtension(archivoSolicitado)) + "\r\n");
+			} 
+			catch (Exception e) 
+			{
+				e.printStackTrace();
+			}
 			salida.print("\r\n"); // Listo los headers, lo siguiente es el mensaje como tal
 			
 			responderArchivo(salida);
@@ -65,6 +83,21 @@ public class RespuestaGET implements HttpRespuesta
 		{
 			e.printStackTrace();
 		}
+	}
+	
+	private String obtenerExtension(File archivo)
+	{
+		String fileName = archivo.getName();
+		
+		// Si hay . y si el nombre no termina con .
+        if(fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0)
+        {
+            return fileName.substring(fileName.lastIndexOf(".")+1);
+        }
+        else 
+        {
+        	return "";
+        }
 	}
 
 }

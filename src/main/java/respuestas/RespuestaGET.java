@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.time.Instant;
+
 
 import servidor.ProcesadorXML;
 
@@ -40,7 +42,9 @@ public class RespuestaGET implements HttpRespuesta
 		if(archivoSolicitado.exists())
 		{
 			salida.print("HTTP/1.1 200 OK\r\n");
-			salida.print("Date: Mon, 27 Jul 2009 12:28:53 GMT\r\n");
+		
+			
+			salida.print("Date: " + Instant.now().toString()   + "GMT\r\n"); // FALTA FORMATO
 			salida.print("Server: MiServidor/1.0\r\n");
 			salida.print("Content-Length: " + archivoSolicitado.length() +"\r\n");
 			

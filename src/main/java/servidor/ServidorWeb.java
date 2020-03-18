@@ -10,13 +10,11 @@ import respuestas.HttpRespuesta;
 import respuestas.RespuestaGET;
 
 
-// http://www.java2s.com/Code/Java/Network-Protocol/AverysimpleWebserverWhenitreceivesaHTTPrequestitsendstherequestbackasthereply.htm
-public class ServidorWeb 
+// Comunicacion cliente-servidor: http://www.java2s.com/Code/Java/Network-Protocol/AverysimpleWebserverWhenitreceivesaHTTPrequestitsendstherequestbackasthereply.htm
+// Threads: https://www.tutorialspoint.com/javaexamples/net_multisoc.htm
+public class ServidorWeb
 {
-	
-    //static ServerSocket variable
     private ServerSocket socketServidor;
-    //socket server port on which it will listen
     private final int PUERTO = 9881;
     
     private HttpRespuesta respuesta = null;
@@ -24,26 +22,24 @@ public class ServidorWeb
 	
 	public void ejecutar() throws IOException
 	{
-        // Create the socket server object
         socketServidor = new ServerSocket(PUERTO);
         
         
-        // Keep listens indefinitely until receives 'exit' call or program terminates
         while(true)
         {
             System.out.println("***Esperando solicitud***");
             
-            // Creating socket and waiting for client connection
+            // Se queda esperando hasta que haya un request
             Socket socket = socketServidor.accept();
            
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            PrintWriter out = new PrintWriter(socket.getOutputStream());
+            BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            PrintWriter salida = new PrintWriter(socket.getOutputStream());
             
             
             // Leo lo que mando el cliente
             String linea;
             String mensajeSolicitud = "";
-            while ((linea = in.readLine()) != null && respuesta == null) 
+            while ((linea = entrada.readLine()) != null && respuesta == null) 
             {
               if(linea.length() == 0)
               {
@@ -61,13 +57,13 @@ public class ServidorWeb
             
             if(respuesta != null)
             {
-            	respuesta.procesarSolicitud(mensajeSolicitud, out);
+            	respuesta.procesarSolicitud(mensajeSolicitud, salida);
             }
             
             
             respuesta = null;
-            out.close();
-            in.close();
+            salida.close();
+            entrada.close();
             socket.close();
         }
 	}

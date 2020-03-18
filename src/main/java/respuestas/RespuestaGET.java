@@ -14,7 +14,7 @@ public class RespuestaGET implements HttpRespuesta
 {
 	// Estructura de una respuesta https://www.tutorialspoint.com/http/http_responses.htm
 	
-	private final String PATH_RAIZ = "src/main/resources";
+	private final String PATH_RAIZ = "src/main/resources/httpdoc";
 	private ProcesadorXML procesadorXML;
 	
 	public RespuestaGET() 
@@ -59,7 +59,7 @@ public class RespuestaGET implements HttpRespuesta
 			}
 			salida.print("\r\n"); // Listo los headers, lo siguiente es el mensaje como tal
 			
-			responderArchivo(salida);
+			responderArchivo(salida, archivoSolicitado);
 		}
 		else
 		{
@@ -67,13 +67,13 @@ public class RespuestaGET implements HttpRespuesta
 		}
 	}
 	
-	private void responderArchivo(PrintWriter salida)
+	private void responderArchivo(PrintWriter salida, File archivo)
 	{
 		BufferedReader lector;
 		
 		try 
 		{
-			lector = new BufferedReader(new FileReader("src/main/resources/index.html"));
+			lector = new BufferedReader(new FileReader(archivo));
 			String linea = null;
 			
 			// Linea por linea para leer y enviar todo el archivo

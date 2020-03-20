@@ -1,12 +1,13 @@
 package respuestas;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.time.Instant;
 
+import com.google.common.io.ByteStreams;
 
 import servidor.ProcesadorXML;
 
@@ -23,7 +24,19 @@ public class RespuestaGET implements HttpRespuesta
 	}
 	
 	@Override
-	public void procesarSolicitud(String mensajeSolicitud, PrintWriter salida) 
+	public void procesarSolicitud(String mensajeSolicitud, OutputStream salida) 
+	{
+		try 
+		{
+			procesarGET(mensajeSolicitud, salida);
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+	}
+	
+	private void procesarGET(String mensajeSolicitud, OutputStream salida) throws IOException
 	{
 		File archivoSolicitado = null;
 		// mensajeSolicitud tine / de primero
@@ -42,25 +55,26 @@ public class RespuestaGET implements HttpRespuesta
 		
 		if(archivoSolicitado.exists())
 		{
-			salida.print("HTTP/1.1 200 OK\r\n");
-		
+			salida.write(convertirBytes("HTTP/1.1 200 OK\r\n"));
 			
-			salida.print("Date: " + Instant.now().toString()   + "GMT\r\n"); // FALTA FORMATO
-			salida.print("Server: MiServidor/1.0\r\n");
-			salida.print("Content-Length: " + archivoSolicitado.length() +"\r\n");
+			salida.write(convertirBytes("Date: " + Instant.now().toString()   + "GMT\r\n")); // FALTA FORMATO
+			salida.write(convertirBytes("Server: MiServidor/1.0\r\n"));
+			salida.write(convertirBytes("Content-Length: " + archivoSolicitado.length() +"\r\n"));
 			
 			try 
 			{
 				// Extraer el dominio y obtener el tipo de acuerdo a web.xml
-				salida.print("Content-Type: " + procesadorXML.obtenerTipo(obtenerExtension(archivoSolicitado)) + "\r\n");
+				salida.write(convertirBytes("Content-Type: " + procesadorXML.obtenerTipo(obtenerExtension(archivoSolicitado)) + "\r\n"));
 			} 
 			catch (Exception e) 
 			{
 				e.printStackTrace();
 			}
-			salida.print("\r\n"); // Listo los headers, lo siguiente es el mensaje como tal
+			salida.write(convertirBytes("\r\n")); // Listo los headers, lo siguiente es el mensaje como tal
 			
 			responderArchivo(salida, archivoSolicitado);
+			
+			// El que llama al metodo se tiene que encargar de hacer flush y cerrar.
 		}
 		else
 		{
@@ -68,26 +82,16 @@ public class RespuestaGET implements HttpRespuesta
 		}
 	}
 	
-	private void responderArchivo(PrintWriter salida, File archivo)
+	private byte[] convertirBytes(String string)
 	{
-		BufferedReader lector;
+		return string.getBytes();
+	}
+	
+	private void responderArchivo(OutputStream salida, File archivo) throws IOException
+	{
+		InputStream entrada = new FileInputStream(archivo);
 		
-		try 
-		{
-			lector = new BufferedReader(new FileReader(archivo));
-			String linea = null;
-			
-			// Linea por linea para leer y enviar todo el archivo
-			while ((linea = lector.readLine()) != null) 
-			{
-				salida.print(linea + "\r\n");
-			}
-			lector.close();
-		} 
-		catch (IOException e) 
-		{
-			e.printStackTrace();
-		}
+		ByteStreams.copy(entrada, salida);
 	}
 	
 	private String obtenerExtension(File archivo)

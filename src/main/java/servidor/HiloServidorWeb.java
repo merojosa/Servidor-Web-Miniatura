@@ -2,7 +2,7 @@ package servidor;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
+import java.io.OutputStream;
 import java.net.Socket;
 
 import respuestas.HttpRespuesta;
@@ -33,8 +33,10 @@ public class HiloServidorWeb implements Runnable
 	
 	private void procesarSolicitud(Socket socket) throws IOException
 	{
+		// Para leer la solicitud del cliente
 		BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        PrintWriter salida =  new PrintWriter(socket.getOutputStream());
+		// Para responderle al cliente en bytes
+        OutputStream salida =  socket.getOutputStream();
         
         
 		// Leo lo que mando el cliente
@@ -65,7 +67,8 @@ public class HiloServidorWeb implements Runnable
         }
         
         respuesta = null;
-        // Al hacer close, se hace el flush y por ende se envia el mensaje
+
+        salida.flush();
         salida.close();
         entrada.close();
         socket.close();

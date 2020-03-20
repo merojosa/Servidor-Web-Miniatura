@@ -1,8 +1,8 @@
 package respuestas;
 
-import java.io.PrintWriter;
+import java.io.OutputStream;
 
 public interface HttpRespuesta 
 {
-	public void procesarSolicitud(String mensajeSolicitud, PrintWriter salida);
+	public void procesarSolicitud(String mensajeSolicitud, OutputStream salida);
 }

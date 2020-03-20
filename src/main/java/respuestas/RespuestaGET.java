@@ -29,6 +29,7 @@ public class RespuestaGET implements HttpRespuesta
 		// mensajeSolicitud tine / de primero
 		String path = PATH_RAIZ + mensajeSolicitud;
 
+		// Si la solicitud se hace sin especificar archivo, se supone un index.html
 		if(mensajeSolicitud.length() > 0 && mensajeSolicitud.charAt(mensajeSolicitud.length() - 1) == '/' )
 		{			
 			// Obtener index.html
@@ -51,7 +52,7 @@ public class RespuestaGET implements HttpRespuesta
 			try 
 			{
 				// Extraer el dominio y obtener el tipo de acuerdo a web.xml
-				salida.print("Content-Type: " + procesadorXML.procesar(obtenerExtension(archivoSolicitado)) + "\r\n");
+				salida.print("Content-Type: " + procesadorXML.obtenerTipo(obtenerExtension(archivoSolicitado)) + "\r\n");
 			} 
 			catch (Exception e) 
 			{

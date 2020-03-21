@@ -59,12 +59,12 @@ public class RespuestaGET implements HttpRespuesta
 		{
 			salida.write(convertirBytes("HTTP/1.1 200 OK\r\n"));
 			
-			SimpleDateFormat sdf = new SimpleDateFormat();
-			sdf.setTimeZone(new SimpleTimeZone(0, "GMT"));
-			sdf.applyPattern("E, dd MMM yyyy HH:mm:ss z");
-			Date testDate = new Date();
+			SimpleDateFormat formateador = new SimpleDateFormat();
+			formateador.setTimeZone(new SimpleTimeZone(0, "GMT"));
+			formateador.applyPattern("E, dd MMM yyyy HH:mm:ss z");
+			Date fecha = new Date();
 			
-			salida.write(convertirBytes("Date: " + sdf.format(testDate) + "\r\n")); // FALTA FORMATO
+			salida.write(convertirBytes("Date: " + formateador.format(fecha) + "\r\n")); // FALTA FORMATO
 			salida.write(convertirBytes("Server: MiServidor/1.0\r\n"));
 			salida.write(convertirBytes("Content-Length: " + archivoSolicitado.length() +"\r\n"));
 			

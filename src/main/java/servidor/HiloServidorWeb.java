@@ -7,6 +7,7 @@ import java.net.Socket;
 
 import respuestas.HttpRespuesta;
 import respuestas.RespuestaGET;
+import respuestas.RespuestaHEAD;
 
 public class HiloServidorWeb implements Runnable 
 {
@@ -55,6 +56,12 @@ public class HiloServidorWeb implements Runnable
 		  	{
 			  	System.out.println("Solicitud GET");
 			  	respuesta = new RespuestaGET();
+			  	mensajeSolicitud = extraerMensaje(linea.toCharArray());
+		  	}
+		  	else if(linea.contains("HEAD"))
+		  	{
+		  		System.out.println("Solicitud HEAD");
+			  	respuesta = new RespuestaHEAD();
 			  	mensajeSolicitud = extraerMensaje(linea.toCharArray());
 		  	}
 		}

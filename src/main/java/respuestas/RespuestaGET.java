@@ -17,7 +17,8 @@ public class RespuestaGET implements HttpRespuesta
 {
 	// Estructura de una respuesta https://www.tutorialspoint.com/http/http_responses.htm
 	
-	private final String PATH_RAIZ = "src/main/resources/httpdoc";
+	private final static String PATH_RAIZ = "src/main/resources/httpdoc";
+	private final static String PATH_404 = "src/main/resources/httpdoc/errores/error404.html";
 	private ProcesadorXML procesadorXML;
 	
 	public RespuestaGET() 
@@ -40,7 +41,6 @@ public class RespuestaGET implements HttpRespuesta
 	
 	private void procesarGET(String mensajeSolicitud, OutputStream salida) throws IOException
 	{
-		File archivoSolicitado = null;
 		// mensajeSolicitud tine / de primero
 		String path = PATH_RAIZ + mensajeSolicitud;
 
@@ -52,32 +52,14 @@ public class RespuestaGET implements HttpRespuesta
 		}
 
 		// Obtener del archivo de acuerdo al path de parametro
-		archivoSolicitado = new File(path);
+		File archivoSolicitado = new File(path);
 		
 		
 		if(archivoSolicitado.exists())
 		{
-			salida.write(convertirBytes("HTTP/1.1 200 OK\r\n"));
+			salida.write(convertirBytes("HTTP/1.1 " + CodigoHttp.OK.obtenerMensaje() + "\r\n"));
 			
-			SimpleDateFormat formateador = new SimpleDateFormat();
-			formateador.setTimeZone(new SimpleTimeZone(0, "GMT"));
-			formateador.applyPattern("E, dd MMM yyyy HH:mm:ss z");
-			Date fecha = new Date();
-			
-			salida.write(convertirBytes("Date: " + formateador.format(fecha) + "\r\n")); // FALTA FORMATO
-			salida.write(convertirBytes("Server: MiServidor/1.0\r\n"));
-			salida.write(convertirBytes("Content-Length: " + archivoSolicitado.length() +"\r\n"));
-			
-			try 
-			{
-				// Extraer el dominio y obtener el tipo de acuerdo a web.xml
-				salida.write(convertirBytes("Content-Type: " + procesadorXML.obtenerTipo(obtenerExtension(archivoSolicitado)) + "\r\n"));
-			} 
-			catch (Exception e) 
-			{
-				e.printStackTrace();
-			}
-			salida.write(convertirBytes("\r\n")); // Listo los headers, lo siguiente es el mensaje como tal
+			enviarEncabezadosComunes(salida, archivoSolicitado);
 			
 			responderArchivo(salida, archivoSolicitado);
 			
@@ -86,7 +68,37 @@ public class RespuestaGET implements HttpRespuesta
 		else
 		{
 			// Error
+			salida.write(convertirBytes("HTTP/1.1 " + CodigoHttp.NOT_FOUND.obtenerMensaje() + "\r\n"));
+			
+			archivoSolicitado = new File(PATH_404);
+			enviarEncabezadosComunes(salida, archivoSolicitado);
+			responderArchivo(salida, archivoSolicitado);
+
 		}
+	}
+	
+	// Incluye el fin de los encabezados
+	private void enviarEncabezadosComunes(OutputStream salida, File archivoSolicitado) throws IOException
+	{
+		SimpleDateFormat formateador = new SimpleDateFormat();
+		formateador.setTimeZone(new SimpleTimeZone(0, "GMT"));
+		formateador.applyPattern("E, dd MMM yyyy HH:mm:ss z");
+		Date fecha = new Date();
+		
+		salida.write(convertirBytes("Date: " + formateador.format(fecha) + "\r\n")); // FALTA FORMATO
+		salida.write(convertirBytes("Server: MiServidor/1.0\r\n"));
+		salida.write(convertirBytes("Content-Length: " + archivoSolicitado.length() +"\r\n"));
+		
+		try 
+		{
+			// Extraer el dominio y obtener el tipo de acuerdo a web.xml
+			salida.write(convertirBytes("Content-Type: " + procesadorXML.obtenerTipo(obtenerExtension(archivoSolicitado)) + "\r\n"));
+		} 
+		catch (Exception e) 
+		{
+			e.printStackTrace();
+		}
+		salida.write(convertirBytes("\r\n")); // Listo los headers, lo siguiente es el mensaje como tal
 	}
 	
 	private byte[] convertirBytes(String string)

@@ -8,14 +8,19 @@ import java.net.Socket;
 import respuestas.HttpRespuesta;
 import respuestas.RespuestaGET;
 import respuestas.RespuestaHEAD;
+import respuestas.RespuestaNoImplementado;
 
 public class HiloServidorWeb implements Runnable 
 {
 	private Socket socket;
+	private HttpRespuesta respuesta;
 	
 	public HiloServidorWeb(Socket socket) 
 	{
 		this.socket = socket;
+		respuesta = new RespuestaGET();
+		respuesta.construirCadenaDeSolicitudes(new RespuestaHEAD())
+					.construirCadenaDeSolicitudes(new RespuestaNoImplementado());
 		
 	}
 
@@ -39,70 +44,16 @@ public class HiloServidorWeb implements Runnable
 		// Para responderle al cliente en bytes
         OutputStream salida =  socket.getOutputStream();
         
-        
-		// Leo lo que mando el cliente
-		HttpRespuesta respuesta = null;
-        String linea;
-        String mensajeSolicitud = "";
- 
-        while ((linea = entrada.readLine()) != null && respuesta == null) 
-		{
-			if(linea.length() == 0)
-		  	{
-			  	break;
-		  	}
-		  
-		  	if(linea.contains("GET"))
-		  	{
-			  	System.out.println("Solicitud GET");
-			  	respuesta = new RespuestaGET();
-			  	mensajeSolicitud = extraerMensaje(linea.toCharArray());
-		  	}
-		  	else if(linea.contains("HEAD"))
-		  	{
-		  		System.out.println("Solicitud HEAD");
-			  	respuesta = new RespuestaHEAD();
-			  	mensajeSolicitud = extraerMensaje(linea.toCharArray());
-		  	}
-		}
-
-        
-        if(respuesta != null)
-        {
-        	respuesta.procesarSolicitud(mensajeSolicitud, salida);
-            System.out.println("Respuesta enviada");
-        }
-        
-        respuesta = null;
+		
+        String linea = entrada.readLine();
+		if(linea.length() != 0)
+	  	{
+			respuesta.chequearSolicitud(linea, salida);
+	  	}
 
         salida.flush();
         salida.close();
         entrada.close();
         socket.close();
 	}
-	
-	// Para extraer lo que hay entre el GET/POST/HEAD y HTTP (o sea, el mensaje)
-	private String extraerMensaje(char[] linea) 
-	{
-		int inicio = -1;
-		int fin = -1;
-		for(int contador = 0; contador < linea.length; ++contador)
-		{
-			if(linea[contador] == ' ')
-			{
-				if(inicio == -1)
-				{
-					inicio = contador + 1;
-				}
-				else
-				{
-					fin = contador;
-					break;
-				}
-			}
-		}
-
-		return new String(linea).substring(inicio, fin);
-	}
-
 }

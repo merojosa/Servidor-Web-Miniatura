@@ -19,11 +19,20 @@ public abstract class HttpRespuesta
 	
 	protected final static String PATH_RAIZ = "src/main/resources/httpdoc";
 	protected final static String PATH_404 = "src/main/resources/httpdoc/errores/error404.html";
+	
+	protected HttpRespuesta siguiente;
 
 	
 	protected HttpRespuesta()
 	{
 		procesadorXML = new ProcesadorXML();
+	}
+	
+	// Chain of responsability
+	public HttpRespuesta construirCadenaDeSolicitudes(HttpRespuesta siguiente)
+	{
+		this.siguiente = siguiente;
+		return siguiente;
 	}
 		
 	// Incluye el fin de los encabezados
@@ -36,12 +45,17 @@ public abstract class HttpRespuesta
 		
 		salida.write(convertirBytes("Date: " + formateador.format(fecha) + "\r\n")); // FALTA FORMATO
 		salida.write(convertirBytes("Server: MiServidor/1.0\r\n"));
-		salida.write(convertirBytes("Content-Length: " + archivoSolicitado.length() +"\r\n"));
+		
 		
 		try 
 		{
-			// Extraer el dominio y obtener el tipo de acuerdo a web.xml
-			salida.write(convertirBytes("Content-Type: " + procesadorXML.obtenerTipo(obtenerExtension(archivoSolicitado)) + "\r\n"));
+			if(archivoSolicitado != null)
+			{
+				salida.write(convertirBytes("Content-Length: " + archivoSolicitado.length() +"\r\n"));
+				
+				// Extraer el dominio y obtener el tipo de acuerdo a web.xml
+				salida.write(convertirBytes("Content-Type: " + procesadorXML.obtenerTipo(obtenerExtension(archivoSolicitado)) + "\r\n"));
+			}
 		} 
 		catch (Exception e) 
 		{
@@ -77,6 +91,37 @@ public abstract class HttpRespuesta
 		ByteStreams.copy(entrada, salida);
 	}
 	
-	public abstract void procesarSolicitud(String mensajeSolicitud, OutputStream salida);
+	public void chequearSolicitud(String solicitud, OutputStream salida)
+	{
+		if(procesarSolicitud(solicitud, salida) == false)
+		{
+			siguiente.chequearSolicitud(solicitud, salida);
+		}
+	}
+	
+	protected String extraerMensaje(char[] linea)
+	{
+		int inicio = -1;
+		int fin = -1;
+		for(int contador = 0; contador < linea.length; ++contador)
+		{
+			if(linea[contador] == ' ')
+			{
+				if(inicio == -1)
+				{
+					inicio = contador + 1;
+				}
+				else
+				{
+					fin = contador;
+					break;
+				}
+			}
+		}
+
+		return new String(linea).substring(inicio, fin);
+	}
+	
+	public abstract boolean procesarSolicitud(String mensajeSolicitud, OutputStream salida);
 		
 }

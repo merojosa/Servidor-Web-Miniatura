@@ -1,6 +1,6 @@
 package respuestas;
 
-// Mensaje de los codigos: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+// Mensaje y explicacion de los codigos: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
 public enum CodigoHttp 
 {
 	OK("200 OK"),

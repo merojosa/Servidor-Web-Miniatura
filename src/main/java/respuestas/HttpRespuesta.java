@@ -5,13 +5,11 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.SimpleTimeZone;
 
 import com.google.common.io.ByteStreams;
 
 import servidor.ProcesadorXML;
+import servidor.ServidorWeb;
 
 public abstract class HttpRespuesta 
 {
@@ -37,15 +35,9 @@ public abstract class HttpRespuesta
 		
 	// Incluye el fin de los encabezados
 	protected void enviarEncabezadosComunes(OutputStream salida, File archivoSolicitado) throws IOException
-	{
-		SimpleDateFormat formateador = new SimpleDateFormat();
-		formateador.setTimeZone(new SimpleTimeZone(0, "GMT"));
-		formateador.applyPattern("E, dd MMM yyyy HH:mm:ss z");
-		Date fecha = new Date();
-		
-		salida.write(convertirBytes("Date: " + formateador.format(fecha) + "\r\n")); // FALTA FORMATO
-		salida.write(convertirBytes("Server: MiServidor/1.0\r\n"));
-		
+	{		
+		salida.write(convertirBytes("Date: " + ServidorWeb.obtenerFechaServidorGMT() + "\r\n")); // FALTA FORMATO
+		salida.write(convertirBytes("Server: " + ServidorWeb.NOMBRE_SERVIDOR + "\r\n"));
 		
 		try 
 		{

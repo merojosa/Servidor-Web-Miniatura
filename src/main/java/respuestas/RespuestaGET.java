@@ -4,9 +4,20 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import servidor.BitacoraManager;
+
 public class RespuestaGET extends HttpRespuesta 
 {
 	// Estructura de una respuesta https://www.tutorialspoint.com/http/http_responses.htm
+	private String url;
+	private String datos;
+	
+	public RespuestaGET() 
+	{
+		super();
+		url = "";
+		datos = "";
+	}
 		
 	@Override
 	public boolean procesarSolicitud(Solicitud solicitud, OutputStream salida) 
@@ -16,6 +27,11 @@ public class RespuestaGET extends HttpRespuesta
 			try 
 			{
 				procesarGET(solicitud.obtenerValor("GET"), salida);
+				
+				String referer = solicitud.obtenerValor("Referer");
+				
+				BitacoraManager.escribirEntrada("GET", referer == null ? "" :  referer, url, datos);
+				
 				return true;
 			} 
 			catch (IOException e) 
@@ -26,27 +42,29 @@ public class RespuestaGET extends HttpRespuesta
 		return false;
 	}
 	
+	// Se actualizan url y datos (si es que hay datos).
 	private void procesarGET(String mensajeSolicitud, OutputStream salida) throws IOException
 	{
 		// mensajeSolicitud tiene / de primero
 		String path = PATH_RAIZ;
-		String datos = "";
 		int indexDatos = mensajeSolicitud.indexOf('?');
 		
+		// Existen datos con ?
 		if( indexDatos >= 0)
 		{
 			datos = mensajeSolicitud.substring(indexDatos + 1);
-			path += mensajeSolicitud.substring(0, indexDatos); // No incluir lo que hay despues del ?
+			url = mensajeSolicitud.substring(0, indexDatos); // No incluir lo que hay despues del ?
+			path += url;
 		}
 		else
 		{
-			path += mensajeSolicitud;
+			url = mensajeSolicitud;
+			path += url;
 		}
 
 		// Si la solicitud se hace sin especificar archivo, se supone un index.html
-		if(mensajeSolicitud.length() > 0 && mensajeSolicitud.charAt(mensajeSolicitud.length() - 1) == '/' )
+		if(mensajeSolicitud.length() > 0 && url.charAt(mensajeSolicitud.length() - 1) == '/' )
 		{			
-			// Obtener index.html
 			path = path.concat("index.html");
 		}
 

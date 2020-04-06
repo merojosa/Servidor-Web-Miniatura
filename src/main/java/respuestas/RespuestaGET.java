@@ -51,13 +51,14 @@ public class RespuestaGET extends HttpRespuesta
 		}
 
 		// Obtener del archivo de acuerdo al path de parametro
-		File archivoSolicitado = new File(path);
-		
-		
+		devolverArchivoSolicitado(new File(path), salida);
+	}
+	
+	public void devolverArchivoSolicitado(File archivoSolicitado, OutputStream salida) throws IOException
+	{
 		if(archivoSolicitado.exists())
 		{
 			salida.write(convertirBytes("HTTP/1.1 " + CodigoHttp.OK.obtenerMensaje() + "\r\n"));
-			
 			enviarEncabezadosComunes(salida, archivoSolicitado);
 			
 			responderArchivo(salida, archivoSolicitado);
@@ -72,7 +73,6 @@ public class RespuestaGET extends HttpRespuesta
 			archivoSolicitado = new File(PATH_404);
 			enviarEncabezadosComunes(salida, archivoSolicitado);
 			responderArchivo(salida, archivoSolicitado);
-
 		}
 	}
 }

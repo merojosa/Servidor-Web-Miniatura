@@ -29,7 +29,19 @@ public class RespuestaGET extends HttpRespuesta
 	private void procesarGET(String mensajeSolicitud, OutputStream salida) throws IOException
 	{
 		// mensajeSolicitud tiene / de primero
-		String path = PATH_RAIZ + mensajeSolicitud;
+		String path = PATH_RAIZ;
+		String datos = "";
+		int indexDatos = mensajeSolicitud.indexOf('?');
+		
+		if( indexDatos >= 0)
+		{
+			datos = mensajeSolicitud.substring(indexDatos + 1);
+			path += mensajeSolicitud.substring(0, indexDatos); // No incluir lo que hay despues del ?
+		}
+		else
+		{
+			path += mensajeSolicitud;
+		}
 
 		// Si la solicitud se hace sin especificar archivo, se supone un index.html
 		if(mensajeSolicitud.length() > 0 && mensajeSolicitud.charAt(mensajeSolicitud.length() - 1) == '/' )

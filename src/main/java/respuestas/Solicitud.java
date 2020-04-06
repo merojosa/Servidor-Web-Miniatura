@@ -1,14 +1,14 @@
 package respuestas;
 
-import java.io.BufferedReader;
+import java.io.BufferedInputStream;
 import java.util.Hashtable;
 
 public class Solicitud 
 {
 	private Hashtable<String, String> datos;
-	private BufferedReader entrada;
+	private BufferedInputStream entrada;
 	
-	public Solicitud(BufferedReader entrada)
+	public Solicitud(BufferedInputStream entrada)
 	{
 		datos = new Hashtable<String, String>();
 		this.entrada = entrada;
@@ -29,7 +29,7 @@ public class Solicitud
 		return datos.get(encabezado);
 	}
 	
-	public BufferedReader getEntrada()
+	public BufferedInputStream getEntrada()
 	{
 		return entrada;
 	}

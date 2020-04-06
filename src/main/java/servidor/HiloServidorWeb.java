@@ -1,7 +1,6 @@
 package servidor;
-import java.io.BufferedReader;
+import java.io.BufferedInputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 
@@ -9,6 +8,7 @@ import respuestas.HttpRespuesta;
 import respuestas.RespuestaGET;
 import respuestas.RespuestaHEAD;
 import respuestas.RespuestaNoImplementado;
+import respuestas.RespuestaPOST;
 import respuestas.Solicitud;
 
 public class HiloServidorWeb implements Runnable 
@@ -21,6 +21,7 @@ public class HiloServidorWeb implements Runnable
 		this.socket = socket;
 		respuesta = new RespuestaGET();
 		respuesta.construirCadenaDeSolicitudes(new RespuestaHEAD())
+					.construirCadenaDeSolicitudes(new RespuestaPOST())
 					.construirCadenaDeSolicitudes(new RespuestaNoImplementado());
 		
 	}
@@ -37,11 +38,11 @@ public class HiloServidorWeb implements Runnable
 			e.printStackTrace();
 		}
 	}
-	// https://stackoverflow.com/questions/30901173/handling-post-request-via-socket-in-java
+
 	private void procesarSolicitud(Socket socket) throws IOException
 	{
 		// Para leer la solicitud del cliente
-		BufferedReader entrada = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		BufferedInputStream  entrada = new BufferedInputStream(socket.getInputStream());
 		// Para responderle al cliente en bytes
         OutputStream salida =  socket.getOutputStream();
                 
@@ -54,9 +55,9 @@ public class HiloServidorWeb implements Runnable
         socket.close();
 	}
 	
-	private Solicitud procesarEntrada(BufferedReader entrada) throws IOException
+	private Solicitud procesarEntrada(BufferedInputStream entrada) throws IOException
 	{
-        String linea = entrada.readLine();
+        String linea = leerLinea(entrada);
         String llave = "";
         String valor = "";
         Solicitud solicitud = new Solicitud(entrada);
@@ -84,9 +85,43 @@ public class HiloServidorWeb implements Runnable
 			}
 			
 			solicitud.agregarEncabezado(llave, valor);
-			linea = entrada.readLine();
+			linea = leerLinea(entrada);
 		}
 		
 		return solicitud;
+	}
+	
+	private String leerLinea(BufferedInputStream in) throws IOException
+	{
+	    // HTTP carries both textual and binary elements.
+	    // Not using BufferedReader.readLine() so it does
+	    // not "steal" bytes from BufferedInputStream...
+
+	    // HTTP itself only allows 7bit ASCII characters
+	    // in headers, but some header values may be
+	    // further encoded using RFC 2231 or 5987 to
+	    // carry Unicode characters ...
+
+	    StringBuilder constructor_string = new StringBuilder();
+	    
+	    char caracter;
+
+	    while ((caracter = (char) in.read()) >= 0) 
+	    {
+	        if (caracter == '\n') 
+	        	break;
+	        
+	        if (caracter == '\r') 
+	        {
+	            caracter = (char) in.read();
+	            if ((caracter < 0) || (caracter == '\n'))
+	            	break;
+	            
+	            constructor_string.append('\r');
+	        }
+	        constructor_string.append(caracter);
+	    }
+	    
+	    return constructor_string.toString();
 	}
 }

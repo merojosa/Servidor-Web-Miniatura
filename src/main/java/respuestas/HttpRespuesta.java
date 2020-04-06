@@ -91,7 +91,7 @@ public abstract class HttpRespuesta
 		ByteStreams.copy(entrada, salida);
 	}
 	
-	public void chequearSolicitud(String solicitud, OutputStream salida)
+	public void chequearSolicitud(Solicitud solicitud, OutputStream salida)
 	{
 		if(procesarSolicitud(solicitud, salida) == false)
 		{
@@ -122,6 +122,6 @@ public abstract class HttpRespuesta
 		return new String(linea).substring(inicio, fin);
 	}
 	
-	public abstract boolean procesarSolicitud(String mensajeSolicitud, OutputStream salida);
+	public abstract boolean procesarSolicitud(Solicitud solicitud, OutputStream salida);
 		
 }

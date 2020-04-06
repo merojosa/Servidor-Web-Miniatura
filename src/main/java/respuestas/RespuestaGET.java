@@ -9,13 +9,13 @@ public class RespuestaGET extends HttpRespuesta
 	// Estructura de una respuesta https://www.tutorialspoint.com/http/http_responses.htm
 		
 	@Override
-	public boolean procesarSolicitud(String mensajeSolicitud, OutputStream salida) 
+	public boolean procesarSolicitud(Solicitud solicitud, OutputStream salida) 
 	{
-		if(mensajeSolicitud.contains("GET"))
+		if(solicitud.encabezadoExiste("GET"))
 		{
 			try 
 			{
-				procesarGET(extraerMensaje(mensajeSolicitud.toCharArray()), salida);
+				procesarGET(solicitud.obtenerValor("GET"), salida);
 				return true;
 			} 
 			catch (IOException e) 

@@ -8,11 +8,11 @@ import java.io.OutputStream;
 public class RespuestaHEAD extends HttpRespuesta 
 {
 	@Override
-	public boolean procesarSolicitud(String mensajeSolicitud, OutputStream salida) 
+	public boolean procesarSolicitud(Solicitud solicitud, OutputStream salida) 
 	{
-		if(mensajeSolicitud.contains("HEAD"))
+		if(solicitud.encabezadoExiste("HEAD"))
 		{
-			String mensajeProcesado = extraerMensaje(mensajeSolicitud.toCharArray());
+			String mensajeProcesado = solicitud.obtenerValor("HEAD");
 			String path = PATH_RAIZ + mensajeProcesado;
 
 			if(mensajeProcesado.length() > 0 && mensajeProcesado.charAt(mensajeProcesado.length() - 1) == '/' )

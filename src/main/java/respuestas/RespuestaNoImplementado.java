@@ -6,7 +6,7 @@ import java.io.OutputStream;
 public class RespuestaNoImplementado extends HttpRespuesta {
 
 	@Override
-	public boolean procesarSolicitud(String mensajeSolicitud, OutputStream salida) 
+	public boolean procesarSolicitud(Solicitud solicitud, OutputStream salida) 
 	{
 		try 
 		{

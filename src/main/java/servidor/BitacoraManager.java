@@ -31,7 +31,7 @@ public class BitacoraManager
 			
 			writer.close();
 		} 
-		catch (FileNotFoundException | UnsupportedEncodingException e) 
+		catch (FileNotFoundException e) 
 		{
 			e.printStackTrace();
 		}

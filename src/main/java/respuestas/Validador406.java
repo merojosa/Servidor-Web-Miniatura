@@ -15,29 +15,37 @@ public class Validador406 extends ValidadorErrorCliente
 	@Override
 	protected boolean validarError(Url url, Solicitud solicitud)
 	{
-		if(solicitud.encabezadoExiste("Accept"))
+		// Este if entra unicamente por requerimiento de la tarea, solo se valida el error 406 con curl
+		if(solicitud.obtenerValor("User-Agent").contains("curl") == true)
 		{
-			try 
+			if(solicitud.encabezadoExiste("Accept"))
 			{
-				String tipoRequerido = procesadorXML.obtenerTipo(ServidorWeb.obtenerExtension(url.getLinkFisico()));
-				String[] tiposSolicitados = solicitud.obtenerValor("Accept").split(",");
-				
-				for(int contador = 0; contador < tiposSolicitados.length; ++contador)
+				try 
 				{
-					// El tipo requerido y uno de los tipos solicitados si calzan.
-					if(tiposSolicitados[contador].equals(tipoRequerido) == true)
+					String tipoRequerido = procesadorXML.obtenerTipo(ServidorWeb.obtenerExtension(url.getLinkFisico()));
+					String[] tiposSolicitados = solicitud.obtenerValor("Accept").split(",");
+					
+					for(int contador = 0; contador < tiposSolicitados.length; ++contador)
 					{
-						// No hay error
-						return false;
+						// El tipo requerido y uno de los tipos solicitados si calzan.
+						if(tiposSolicitados[contador].equals(tipoRequerido) == true)
+						{
+							// No hay error
+							return false;
+						}
 					}
+				} 
+				catch (Exception e) 
+				{
+					e.printStackTrace();
 				}
-			} 
-			catch (Exception e) 
-			{
-				e.printStackTrace();
 			}
+			return true;
 		}
-		return true;
+		else 
+		{
+			return false;
+		}
 	}
 
 	protected String obtenerCodigo() 

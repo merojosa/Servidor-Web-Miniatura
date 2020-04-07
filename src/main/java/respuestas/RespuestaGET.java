@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import servidor.BitacoraManager;
-import servidor.ServidorWeb;
 
 public class RespuestaGET extends HttpRespuesta 
 {
@@ -36,23 +35,11 @@ public class RespuestaGET extends HttpRespuesta
 	
 	public void devolverArchivoSolicitado(File archivoSolicitado, OutputStream salida) throws IOException
 	{
-		if(archivoSolicitado.exists())
-		{
-			salida.write(convertirBytes("HTTP/1.1 " + CodigoHttp.OK.obtenerMensaje() + "\r\n"));
-			enviarEncabezadosComunes(salida, archivoSolicitado);
-			
-			responderArchivo(salida, archivoSolicitado);
-			
-			// El que llama al metodo se tiene que encargar de hacer flush y cerrar.
-		}
-		else
-		{
-			// Error
-			salida.write(convertirBytes("HTTP/1.1 " + CodigoHttp.NOT_FOUND.obtenerMensaje() + "\r\n"));
-			
-			archivoSolicitado = new File(ServidorWeb.PATH_404);
-			enviarEncabezadosComunes(salida, archivoSolicitado);
-			responderArchivo(salida, archivoSolicitado);
-		}
+		salida.write(convertirBytes("HTTP/1.1 " + CodigoHttp.OK.obtenerMensaje() + "\r\n"));
+		enviarEncabezadosComunes(salida, archivoSolicitado);
+		
+		responderArchivo(salida, archivoSolicitado);
+		
+		// El que llama al metodo se tiene que encargar de hacer flush y cerrar.
 	}
 }

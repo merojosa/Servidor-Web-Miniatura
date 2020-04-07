@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import servidor.BitacoraManager;
-import servidor.ServidorWeb;
 
 // Envio lo mismo que un GET excepto el archivo
 public class RespuestaHEAD extends HttpRespuesta 
@@ -34,28 +33,17 @@ public class RespuestaHEAD extends HttpRespuesta
 	{
 		File archivoSolicitado = new File(url.getLinkFisico());
 		
-		if(archivoSolicitado.exists())
+		try 
 		{
-			try 
-			{
-				salida.write(convertirBytes("HTTP/1.1 " + CodigoHttp.OK.obtenerMensaje() + "\r\n"));			
-				enviarEncabezadosComunes(salida, archivoSolicitado);
-				
-			} 
-			catch (IOException e) 
-			{
-				e.printStackTrace();
-			}
-		}
-		else
-		{
-			// Error
-
-			salida.write(convertirBytes("HTTP/1.1 " + CodigoHttp.NOT_FOUND.obtenerMensaje() + "\r\n"));
-			archivoSolicitado = new File(ServidorWeb.PATH_404);
+			salida.write(convertirBytes("HTTP/1.1 " + CodigoHttp.OK.obtenerMensaje() + "\r\n"));			
 			enviarEncabezadosComunes(salida, archivoSolicitado);
-
+			
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
 		}
+		
 		String referer = solicitud.obtenerValor("Referer");
 
 		BitacoraManager.escribirEntrada("HEAD", referer == null ? "Sin referer" :  referer, url.getLinkRelativo(), url.getDatos());

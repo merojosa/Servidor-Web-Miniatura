@@ -8,14 +8,7 @@ import servidor.BitacoraManager;
 
 // Envio lo mismo que un GET excepto el archivo
 public class RespuestaHEAD extends HttpRespuesta 
-{
-	private RespuestaGET respuestaGet;
-	
-	public RespuestaHEAD()
-	{
-		respuestaGet = new RespuestaGET();
-	}
-	
+{	
 	@Override
 	public boolean procesarSolicitud(Solicitud solicitud, OutputStream salida) 
 	{
@@ -38,7 +31,7 @@ public class RespuestaHEAD extends HttpRespuesta
 	
 	private void procesarHEAD(Solicitud solicitud, OutputStream salida) throws IOException
 	{
-		Url url = respuestaGet.procesarUrl(solicitud.obtenerValor("HEAD"), salida);
+		Url url = procesarUrl(solicitud.obtenerValor("HEAD"), salida);
 
 		File archivoSolicitado = new File(url.getLinkFisico());
 		

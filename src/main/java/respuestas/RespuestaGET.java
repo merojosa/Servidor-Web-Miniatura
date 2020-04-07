@@ -9,15 +9,6 @@ import servidor.BitacoraManager;
 public class RespuestaGET extends HttpRespuesta 
 {
 	// Estructura de una respuesta https://www.tutorialspoint.com/http/http_responses.htm
-	private String url;
-	private String datos;
-	
-	public RespuestaGET() 
-	{
-		super();
-		url = "";
-		datos = "";
-	}
 		
 	@Override
 	public boolean procesarSolicitud(Solicitud solicitud, OutputStream salida) 
@@ -26,11 +17,14 @@ public class RespuestaGET extends HttpRespuesta
 		{
 			try 
 			{
-				procesarGET(solicitud.obtenerValor("GET"), salida);
+				Url url = procesarUrl(solicitud.obtenerValor("GET"), salida);
+				
+				// Obtener del archivo de acuerdo al path de parametro
+				devolverArchivoSolicitado(new File(url.getLinkFisico()), salida);
 				
 				String referer = solicitud.obtenerValor("Referer");
 				
-				BitacoraManager.escribirEntrada("GET", referer == null ? "Sin referer" :  referer, url, datos);
+				BitacoraManager.escribirEntrada("GET", referer == null ? "Sin referer" :  referer, url.getLinkRelativo(), url.getDatos());
 				
 				return true;
 			} 
@@ -43,8 +37,10 @@ public class RespuestaGET extends HttpRespuesta
 	}
 	
 	// Se actualizan url y datos (si es que hay datos).
-	private void procesarGET(String mensajeSolicitud, OutputStream salida) throws IOException
+	public Url procesarUrl(String mensajeSolicitud, OutputStream salida) throws IOException
 	{
+		String datos = "";
+		String url = "";
 		// mensajeSolicitud tiene / de primero
 		String path = PATH_RAIZ;
 		int indexDatos = mensajeSolicitud.indexOf('?');
@@ -67,9 +63,8 @@ public class RespuestaGET extends HttpRespuesta
 		{			
 			path = path.concat("index.html");
 		}
-
-		// Obtener del archivo de acuerdo al path de parametro
-		devolverArchivoSolicitado(new File(path), salida);
+		
+		return new Url(url, datos, path);
 	}
 	
 	public void devolverArchivoSolicitado(File archivoSolicitado, OutputStream salida) throws IOException

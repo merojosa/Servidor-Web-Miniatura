@@ -6,12 +6,14 @@ public class Url
 	private String datos;
 	private String linkFisico;
 	
-	public Url(String linkRelativo, String datos, String linkFisico) 
+	private Url() {}
+	private Url(Url url) 
 	{
-		this.linkRelativo = linkRelativo;
-		this.datos = datos;
-		this.linkFisico = linkFisico;
+		this.linkRelativo = url.linkRelativo;
+		this.datos = url.datos;
+		this.linkFisico = url.linkFisico;
 	}
+
 
 	public String getLinkRelativo() 
 	{
@@ -42,4 +44,29 @@ public class Url
 	{
 		this.linkFisico = linkFisico;
 	}
+	
+	public static class Builder
+	{
+		private Url url;
+		
+		public Builder(String linkRelativo, String linkFisico)
+		{
+			this.url = new Url();
+			this.url.setLinkRelativo(linkRelativo);
+			this.url.setLinkFisico(linkFisico);
+		}
+		
+		public Builder agregarDatos(String datos)
+		{
+			this.url.setDatos(datos);
+			return this;
+		}
+		
+		public Url build()
+		{
+			return new Url(url);
+		}
+	}
 }
+
+

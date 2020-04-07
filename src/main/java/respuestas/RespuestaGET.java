@@ -36,7 +36,7 @@ public class RespuestaGET extends HttpRespuesta
 		return false;
 	}
 	
-	// Se actualizan url y datos (si es que hay datos).
+	// Procesa la url dada y las variables que si existen. Devuelve un Url con el link fisico, 
 	public Url procesarUrl(String mensajeSolicitud, OutputStream salida) throws IOException
 	{
 		String datos = "";
@@ -64,7 +64,7 @@ public class RespuestaGET extends HttpRespuesta
 			path = path.concat("index.html");
 		}
 		
-		return new Url(url, datos, path);
+		return new Url.Builder(url, path).agregarDatos(datos).build();
 	}
 	
 	public void devolverArchivoSolicitado(File archivoSolicitado, OutputStream salida) throws IOException

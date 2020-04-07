@@ -14,13 +14,15 @@ import servidor.ServidorWeb;
 public abstract class HttpRespuesta 
 {
 	private ProcesadorXML procesadorXML;
-	
-	protected HttpRespuesta siguiente;
+	private ValidadorErrorCliente validador;
+	private HttpRespuesta siguiente;
 
 	
 	protected HttpRespuesta()
 	{
 		procesadorXML = new ProcesadorXML();
+		validador = new Validador404();
+		validador.contruirValidador(new Validador406());
 	}
 	
 	// Chain of responsability
@@ -76,7 +78,6 @@ public abstract class HttpRespuesta
 	protected void responderArchivo(OutputStream salida, File archivo) throws IOException
 	{
 		InputStream entrada = new FileInputStream(archivo);
-		
 		ByteStreams.copy(entrada, salida);
 	}
 	
@@ -135,9 +136,23 @@ public abstract class HttpRespuesta
 	}
 	
 	// Codigos 4xx
-	protected boolean validarErroresCliente(Url url, Solicitud solicitud)
+	protected boolean validarErroresCliente(Url url, Solicitud solicitud, OutputStream salida) throws IOException
 	{
-		return true;
+		String error = validador.buscarError(url, solicitud);
+		if(error != null)
+		{
+			// Error
+			salida.write(("HTTP/1.1 " + error + "\r\n").getBytes());
+			enviarEncabezadosComunes(salida, null);
+			
+			return true;
+		}
+		else
+		{
+			// No hay error
+			return false;
+		}
+
 	}
 	
 	public void chequearSolicitud(Solicitud solicitud, OutputStream salida)
@@ -145,7 +160,7 @@ public abstract class HttpRespuesta
 		try 
 		{
 			Url url = procesarUrl(solicitud.obtenerValor("Url"));
-			if(validarErroresCliente(url, solicitud) == true)
+			if(validarErroresCliente(url, solicitud, salida) == false)
 			{
 				buscarSolicitud(solicitud, url, salida);
 			}

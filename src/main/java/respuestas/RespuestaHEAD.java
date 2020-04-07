@@ -4,56 +4,69 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import servidor.BitacoraManager;
+
 // Envio lo mismo que un GET excepto el archivo
 public class RespuestaHEAD extends HttpRespuesta 
 {
+	private RespuestaGET respuestaGet;
+	
+	public RespuestaHEAD()
+	{
+		respuestaGet = new RespuestaGET();
+	}
+	
 	@Override
 	public boolean procesarSolicitud(Solicitud solicitud, OutputStream salida) 
 	{
 		if(solicitud.encabezadoExiste("HEAD"))
 		{
-			String mensajeProcesado = solicitud.obtenerValor("HEAD");
-			String path = PATH_RAIZ + mensajeProcesado;
-
-			if(mensajeProcesado.length() > 0 && mensajeProcesado.charAt(mensajeProcesado.length() - 1) == '/' )
-			{			
-				path = path.concat("index.html");
-			}
-
-
-			File archivoSolicitado = new File(path);
-			
-			if(archivoSolicitado.exists())
+			try 
 			{
-				try 
-				{
-					salida.write(convertirBytes("HTTP/1.1 " + CodigoHttp.OK.obtenerMensaje() + "\r\n"));			
-					enviarEncabezadosComunes(salida, archivoSolicitado);
-					return true;
-				} 
-				catch (IOException e) 
-				{
-					e.printStackTrace();
-				}
-			}
-			else
+				procesarHEAD(solicitud, salida);
+			} 
+			catch (IOException e) 
 			{
-				// Error
-				try 
-				{
-					salida.write(convertirBytes("HTTP/1.1 " + CodigoHttp.NOT_FOUND.obtenerMensaje() + "\r\n"));
-					archivoSolicitado = new File(PATH_404);
-					enviarEncabezadosComunes(salida, archivoSolicitado);
-					return true;
-				} 
-				catch (IOException e) 
-				{
-					e.printStackTrace();
-				}
+				e.printStackTrace();
 			}
+
+			return true;
 		}
 		
 		return false;
+	}
+	
+	private void procesarHEAD(Solicitud solicitud, OutputStream salida) throws IOException
+	{
+		Url url = respuestaGet.procesarUrl(solicitud.obtenerValor("HEAD"), salida);
+
+		File archivoSolicitado = new File(url.getLinkFisico());
+		
+		if(archivoSolicitado.exists())
+		{
+			try 
+			{
+				salida.write(convertirBytes("HTTP/1.1 " + CodigoHttp.OK.obtenerMensaje() + "\r\n"));			
+				enviarEncabezadosComunes(salida, archivoSolicitado);
+				
+			} 
+			catch (IOException e) 
+			{
+				e.printStackTrace();
+			}
+		}
+		else
+		{
+			// Error
+
+			salida.write(convertirBytes("HTTP/1.1 " + CodigoHttp.NOT_FOUND.obtenerMensaje() + "\r\n"));
+			archivoSolicitado = new File(PATH_404);
+			enviarEncabezadosComunes(salida, archivoSolicitado);
+
+		}
+		String referer = solicitud.obtenerValor("Referer");
+
+		BitacoraManager.escribirEntrada("HEAD", referer == null ? "Sin referer" :  referer, url.getLinkRelativo(), url.getDatos());
 	}
 
 }

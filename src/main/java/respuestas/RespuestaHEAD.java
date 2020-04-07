@@ -11,13 +11,13 @@ import servidor.ServidorWeb;
 public class RespuestaHEAD extends HttpRespuesta 
 {	
 	@Override
-	public boolean procesarSolicitud(Solicitud solicitud, OutputStream salida) 
+	public boolean procesarSolicitud(Solicitud solicitud, Url url, OutputStream salida) 
 	{
-		if(solicitud.encabezadoExiste("HEAD"))
+		if(solicitud.obtenerValor("TipoRequest").equals("HEAD"))
 		{
 			try 
 			{
-				procesarHEAD(solicitud, salida);
+				procesarHEAD(solicitud, url, salida);
 			} 
 			catch (IOException e) 
 			{
@@ -30,10 +30,8 @@ public class RespuestaHEAD extends HttpRespuesta
 		return false;
 	}
 	
-	private void procesarHEAD(Solicitud solicitud, OutputStream salida) throws IOException
+	private void procesarHEAD(Solicitud solicitud, Url url, OutputStream salida) throws IOException
 	{
-		Url url = procesarUrl(solicitud.obtenerValor("HEAD"), salida);
-
 		File archivoSolicitado = new File(url.getLinkFisico());
 		
 		if(archivoSolicitado.exists())

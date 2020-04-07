@@ -19,15 +19,14 @@ public class RespuestaPOST extends HttpRespuesta
 	}
 
 	@Override
-	public boolean procesarSolicitud(Solicitud solicitud, OutputStream salida) 
+	public boolean procesarSolicitud(Solicitud solicitud, Url url, OutputStream salida) 
 	{
-		if(solicitud.encabezadoExiste("POST"))
+		if(solicitud.obtenerValor("TipoRequest").equals("POST"))
 		{
 			try
 			{
 				byte[] datosPost = new byte[new Integer(solicitud.obtenerValor("Content-Length"))];
-				Url url = procesarUrl(solicitud.obtenerValor("POST"), salida);
-				solicitud.getEntrada().read(datosPost);
+				solicitud.getEntrada().read(datosPost);	// Obtengo los bytes que se enviaron desde el cliente
 				
 				respuestaGET.devolverArchivoSolicitado(new File(url.getLinkFisico()), salida);
 				

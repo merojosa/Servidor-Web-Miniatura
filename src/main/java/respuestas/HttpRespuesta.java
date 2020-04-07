@@ -103,8 +103,8 @@ public abstract class HttpRespuesta
 		return new String(linea).substring(inicio, fin);
 	}
 	
-	// Procesa la url dada y las variables que si existen. Devuelve un Url con el link fisico, 
-	protected Url procesarUrl(String mensajeSolicitud, OutputStream salida) throws IOException
+	// Procesa la url dada y las variables que si existen.
+	private Url procesarUrl(String mensajeSolicitud) throws IOException
 	{
 		String datos = "";
 		String url = "";
@@ -134,14 +134,37 @@ public abstract class HttpRespuesta
 		return new Url.Builder(url, path).agregarDatos(datos).build();
 	}
 	
+	// Codigos 4xx
+	protected boolean validarErroresCliente(Url url, Solicitud solicitud)
+	{
+		return true;
+	}
+	
 	public void chequearSolicitud(Solicitud solicitud, OutputStream salida)
 	{
-		if(procesarSolicitud(solicitud, salida) == false)
+		try 
+		{
+			Url url = procesarUrl(solicitud.obtenerValor("Url"));
+			if(validarErroresCliente(url, solicitud) == true)
+			{
+				buscarSolicitud(solicitud, url, salida);
+			}
+		} 
+		catch (IOException e) 
+		{
+			e.printStackTrace();
+		}
+		
+	}
+	
+	private void buscarSolicitud(Solicitud solicitud, Url url, OutputStream salida)
+	{
+		if(procesarSolicitud(solicitud, url, salida) == false)
 		{
 			siguiente.chequearSolicitud(solicitud, salida);
 		}
 	}
 	
-	public abstract boolean procesarSolicitud(Solicitud solicitud, OutputStream salida);
+	public abstract boolean procesarSolicitud(Solicitud solicitud, Url url, OutputStream salida);
 		
 }

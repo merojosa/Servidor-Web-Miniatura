@@ -12,14 +12,12 @@ public class RespuestaGET extends HttpRespuesta
 	// Estructura de una respuesta https://www.tutorialspoint.com/http/http_responses.htm
 		
 	@Override
-	public boolean procesarSolicitud(Solicitud solicitud, OutputStream salida) 
+	public boolean procesarSolicitud(Solicitud solicitud, Url url, OutputStream salida) 
 	{
-		if(solicitud.encabezadoExiste("GET"))
+		if(solicitud.obtenerValor("TipoRequest").equals("GET"))
 		{
 			try 
-			{
-				Url url = procesarUrl(solicitud.obtenerValor("GET"), salida);
-				
+			{				
 				// Obtener del archivo de acuerdo al path de parametro
 				devolverArchivoSolicitado(new File(url.getLinkFisico()), salida);
 				

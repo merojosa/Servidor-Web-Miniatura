@@ -57,7 +57,7 @@ public class HiloServidorWeb implements Runnable
 	
 	private Solicitud procesarEntrada(BufferedInputStream entrada) throws IOException
 	{
-        String linea = leerLinea(entrada);
+        String linea = leerLineaDesdeBytes(entrada);
         String llave = "";
         String valor = "";
         Solicitud solicitud = new Solicitud(entrada);
@@ -75,33 +75,27 @@ public class HiloServidorWeb implements Runnable
 				valor = linea.substring(index_espacio + 1);
 
 			}
-			else
+			else // Es el request
 			{
-				llave = linea.substring(0, index_espacio);
+				llave = "Url";
 				
 				// Incluir la expresion del medio, no la version http
 				valor = linea.substring(index_espacio + 1);
 				valor = valor.substring(0, valor.indexOf(' '));
+				
+				// Agrego el tipo de request a la solicitud
+				solicitud.agregarEncabezado("TipoRequest", linea.substring(0, index_espacio));
 			}
 			
 			solicitud.agregarEncabezado(llave, valor);
-			linea = leerLinea(entrada);
+			linea = leerLineaDesdeBytes(entrada);
 		}
 		
 		return solicitud;
 	}
 	
-	private String leerLinea(BufferedInputStream in) throws IOException
+	private String leerLineaDesdeBytes(BufferedInputStream in) throws IOException
 	{
-	    // HTTP carries both textual and binary elements.
-	    // Not using BufferedReader.readLine() so it does
-	    // not "steal" bytes from BufferedInputStream...
-
-	    // HTTP itself only allows 7bit ASCII characters
-	    // in headers, but some header values may be
-	    // further encoded using RFC 2231 or 5987 to
-	    // carry Unicode characters ...
-
 	    StringBuilder constructor_string = new StringBuilder();
 	    
 	    char caracter;

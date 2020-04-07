@@ -30,7 +30,7 @@ public class RespuestaGET extends HttpRespuesta
 				
 				String referer = solicitud.obtenerValor("Referer");
 				
-				BitacoraManager.escribirEntrada("GET", referer == null ? "" :  referer, url, datos);
+				BitacoraManager.escribirEntrada("GET", referer == null ? "Sin referer" :  referer, url, datos);
 				
 				return true;
 			} 
@@ -63,7 +63,7 @@ public class RespuestaGET extends HttpRespuesta
 		}
 
 		// Si la solicitud se hace sin especificar archivo, se supone un index.html
-		if(mensajeSolicitud.length() > 0 && url.charAt(mensajeSolicitud.length() - 1) == '/' )
+		if(url.length() > 0 && url.charAt(url.length() - 1) == '/' )
 		{			
 			path = path.concat("index.html");
 		}

@@ -13,10 +13,7 @@ import servidor.ServidorWeb;
 
 public abstract class HttpRespuesta 
 {
-	protected ProcesadorXML procesadorXML;
-	
-	protected final static String PATH_RAIZ = "src/main/resources/httpdoc";
-	protected final static String PATH_404 = "src/main/resources/httpdoc/errores/error404.html";
+	private ProcesadorXML procesadorXML;
 	
 	protected HttpRespuesta siguiente;
 
@@ -83,14 +80,6 @@ public abstract class HttpRespuesta
 		ByteStreams.copy(entrada, salida);
 	}
 	
-	public void chequearSolicitud(Solicitud solicitud, OutputStream salida)
-	{
-		if(procesarSolicitud(solicitud, salida) == false)
-		{
-			siguiente.chequearSolicitud(solicitud, salida);
-		}
-	}
-	
 	protected String extraerMensaje(char[] linea)
 	{
 		int inicio = -1;
@@ -115,12 +104,12 @@ public abstract class HttpRespuesta
 	}
 	
 	// Procesa la url dada y las variables que si existen. Devuelve un Url con el link fisico, 
-	public Url procesarUrl(String mensajeSolicitud, OutputStream salida) throws IOException
+	protected Url procesarUrl(String mensajeSolicitud, OutputStream salida) throws IOException
 	{
 		String datos = "";
 		String url = "";
 		// mensajeSolicitud tiene / de primero
-		String path = PATH_RAIZ;
+		String path = ServidorWeb.PATH_RAIZ;
 		int indexDatos = mensajeSolicitud.indexOf('?');
 		
 		// Existen datos con ?
@@ -143,6 +132,14 @@ public abstract class HttpRespuesta
 		}
 		
 		return new Url.Builder(url, path).agregarDatos(datos).build();
+	}
+	
+	public void chequearSolicitud(Solicitud solicitud, OutputStream salida)
+	{
+		if(procesarSolicitud(solicitud, salida) == false)
+		{
+			siguiente.chequearSolicitud(solicitud, salida);
+		}
 	}
 	
 	public abstract boolean procesarSolicitud(Solicitud solicitud, OutputStream salida);

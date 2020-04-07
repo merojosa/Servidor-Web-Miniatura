@@ -14,7 +14,8 @@ import java.util.SimpleTimeZone;
 public class ServidorWeb
 {
     public static final String NOMBRE_SERVIDOR = "RojasServidor/1.0";
-
+	public final static String PATH_RAIZ = "src/main/resources/httpdoc";
+	public final static String PATH_404 = "src/main/resources/httpdoc/errores/error404.html";
 	
     private ServerSocket socketServidor;
     private final int PUERTO = 9885;

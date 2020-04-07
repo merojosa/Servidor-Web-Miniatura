@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import servidor.BitacoraManager;
+import servidor.ServidorWeb;
 
 // Envio lo mismo que un GET excepto el archivo
 public class RespuestaHEAD extends HttpRespuesta 
@@ -53,7 +54,7 @@ public class RespuestaHEAD extends HttpRespuesta
 			// Error
 
 			salida.write(convertirBytes("HTTP/1.1 " + CodigoHttp.NOT_FOUND.obtenerMensaje() + "\r\n"));
-			archivoSolicitado = new File(PATH_404);
+			archivoSolicitado = new File(ServidorWeb.PATH_404);
 			enviarEncabezadosComunes(salida, archivoSolicitado);
 
 		}

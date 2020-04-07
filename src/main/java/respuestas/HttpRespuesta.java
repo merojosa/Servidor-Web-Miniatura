@@ -45,7 +45,7 @@ public abstract class HttpRespuesta
 				salida.write(convertirBytes("Content-Length: " + archivoSolicitado.length() +"\r\n"));
 				
 				// Extraer el dominio y obtener el tipo de acuerdo a web.xml
-				salida.write(convertirBytes("Content-Type: " + procesadorXML.obtenerTipo(obtenerExtension(archivoSolicitado)) + "\r\n"));
+				salida.write(convertirBytes("Content-Type: " + procesadorXML.obtenerTipo(ServidorWeb.obtenerExtension(archivoSolicitado.getName())) + "\r\n"));
 			}
 		} 
 		catch (Exception e) 
@@ -60,20 +60,6 @@ public abstract class HttpRespuesta
 		return string.getBytes();
 	}
 	
-	protected String obtenerExtension(File archivo)
-	{
-		String fileName = archivo.getName();
-		
-		// Si hay . y si el nombre no termina con .
-        if(fileName.lastIndexOf(".") != -1 && fileName.lastIndexOf(".") != 0)
-        {
-            return fileName.substring(fileName.lastIndexOf(".")+1);
-        }
-        else 
-        {
-        	return "";
-        }
-	}
 	
 	protected void responderArchivo(OutputStream salida, File archivo) throws IOException
 	{

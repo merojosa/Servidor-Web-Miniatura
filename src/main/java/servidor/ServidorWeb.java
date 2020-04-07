@@ -46,4 +46,18 @@ public class ServidorWeb
 		Date fecha = new Date();
 		return formateador.format(fecha);
 	}
+	
+	public static String obtenerExtension(String nombre)
+	{
+		
+		// Si hay . y si el nombre no termina con .
+        if(nombre.lastIndexOf(".") != -1 && nombre.lastIndexOf(".") != 0)
+        {
+            return nombre.substring(nombre.lastIndexOf(".")+1);
+        }
+        else 
+        {
+        	return "";
+        }
+	}
 }
